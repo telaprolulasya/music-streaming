@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-export default function LoginForm() {
+export default function LoginForm({ onLoginSuccess }) {
   const [role, setRole] = useState('user');
   const [form, setForm] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
@@ -11,25 +11,29 @@ export default function LoginForm() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const url =
-        role === 'user'
-          ? 'http://localhost:7076/api/auth/user/login'
-          : 'http://localhost:7076/api/auth/admin/login';
+  e.preventDefault();
+  const url =
+    role === 'user'
+      ? 'http://localhost:5671/api/auth/user/login'
+      : 'http://localhost:5671/api/auth/admin/login';
 
-      const res = await axios.post(url, form);
-      console.log(res.data);
-      if (res.status === 200) {
-        setMessage('Login successful!');
-      } else {
-        setMessage('Invalid credentials');
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage('Login failed');
+  try {
+    const res = await axios.post(url, form, { validateStatus: () => true }); 
+    // 👆 prevents Axios from throwing on 401 etc.
+
+    if (res.status === 200) {
+      setMessage('Login successful!');
+      // pass the whole user/admin object if you want
+      onLoginSuccess(role, res.data);
+    } else {
+      setMessage('Invalid credentials');
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setMessage('Login failed');
+  }
+};
+
 
   return (
     <div>

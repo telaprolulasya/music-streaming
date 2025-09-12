@@ -15,8 +15,8 @@ export default function SignupForm() {
     try {
       const url =
         role === 'user'
-          ? 'http://localhost:7076/api/auth/user/signup'
-          : 'http://localhost:7076/api/auth/admin/signup';
+          ? 'http://localhost:5671/api/auth/user/signup'
+          : 'http://localhost:5671/api/auth/admin/signup';
 
       const res = await axios.post(url, form);
       console.log(res.data);

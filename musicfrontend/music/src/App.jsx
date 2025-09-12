@@ -1,24 +1,50 @@
 import React, { useState } from 'react';
-import SignupForm from './components/SignupForm';
 import LoginForm from './components/LoginForm';
-import './App.css';
+import SignupForm from './components/SignupForm';
+import AdminAddMovie from './components/AdminAddMovie';
+import AdminAddSong from './components/AdminAddSong';
+import MovieList from './components/MovieList';
+import MovieSongs from './components/MovieSongs';
 
 export default function App() {
-  const [view, setView] = useState(null); // 'signup' or 'login'
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState('');
+  const [movie, setMovie] = useState(null); // selected movie for admin add
+  const [selectedMovie, setSelectedMovie] = useState(null); // selected movie for user view
+
+  const handleLoginSuccess = (userRole) => {
+    setRole(userRole);
+    setLoggedIn(true);
+  };
 
   return (
     <div>
-      <header className="header">
-        <div className="right-buttons">
-          <button onClick={() => setView('login')}>Login</button>
-          <button onClick={() => setView('signup')}>Sign Up</button>
-        </div>
-      </header>
-
-      <main>
-        {view === 'signup' && <SignupForm />}
-        {view === 'login' && <LoginForm />}
-      </main>
+      {!loggedIn ? (
+        <>
+          <LoginForm onLoginSuccess={handleLoginSuccess} />
+          <SignupForm />
+        </>
+      ) : (
+        <>
+          {role === 'admin' ? (
+            <>
+              {!movie ? (
+                <AdminAddMovie onMovieAdded={setMovie} />
+              ) : (
+                <AdminAddSong movieId={movie.id} />
+              )}
+            </>
+          ) : (
+            <>
+              {!selectedMovie ? (
+                <MovieList onMovieClick={setSelectedMovie} />
+              ) : (
+                <MovieSongs movie={selectedMovie} onBack={() => setSelectedMovie(null)} />
+              )}
+            </>
+          )}
+        </>
+      )}
     </div>
   );
 }
